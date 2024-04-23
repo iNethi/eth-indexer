@@ -1,0 +1,11 @@
+[metrics]
+go_process = true
+
+[api]
+address = ":5001"
+
+[postgres]
+dsn = "postgres://postgres:postgres@127.0.0.1:5432/ge_celo_data"
+
+[jetstream]
+endpoint = "nats://127.0.0.1:4222"
