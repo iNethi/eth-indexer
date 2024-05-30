@@ -42,6 +42,28 @@ INSERT INTO token_mint(
     mint_value
 ) VALUES($1, $2, $3, $4) ON CONFLICT DO NOTHING
 
+--name: insert-token-burn
+-- $1: tx_id
+-- $2: burner_address
+-- $3: burn_value
+INSERT INTO token_burn(
+    tx_id,
+    burner_address,
+    burn_value
+) VALUES($1, $2, $3) ON CONFLICT DO NOTHING
+
+--name: insert-faucet-give
+-- $1: tx_id
+-- $2: token_address
+-- $3: recipient_address
+-- $4: give_value
+INSERT INTO faucet_give(
+    tx_id,
+    token_address,
+    recipient_address,
+    give_value
+) VALUES($1, $2, $3, $4) ON CONFLICT DO NOTHING
+
 --name: insert-pool-swap
 -- $1: tx_id
 -- $2: initiator_address
@@ -74,3 +96,13 @@ INSERT INTO pool_deposit(
     token_in_address,
     in_value
 ) VALUES($1, $2, $3, $4) ON CONFLICT DO NOTHING
+
+--name: insert-price-quote-update
+-- $1: tx_id
+-- $2: token
+-- $3: exchange_rate
+INSERT INTO price_index_updates(
+    tx_id,
+    token,
+    exchange_rate,
+) VALUES($1, $2, $3) ON CONFLICT DO NOTHING

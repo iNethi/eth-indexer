@@ -5,31 +5,34 @@ import (
 	"encoding/json"
 	"errors"
 	"log/slog"
+	"time"
 
-	"github.com/grassrootseconomics/celo-indexer/internal/event"
 	"github.com/grassrootseconomics/celo-indexer/internal/store"
+	"github.com/grassrootseconomics/celo-tracker/pkg/event"
 	"github.com/nats-io/nats.go"
-)
-
-const (
-	durableId   = "celo-indexer-6"
-	pullStream  = "TRACKER"
-	pullSubject = "TRACKER.*"
+	"github.com/nats-io/nats.go/jetstream"
 )
 
 type (
 	JetStreamOpts struct {
-		Logg     *slog.Logger
-		Endpoint string
-		Store    store.Store
+		Store       store.Store
+		Logg        *slog.Logger
+		Endpoint    string
+		JetStreamID string
 	}
 
 	JetStreamSub struct {
-		natsConn *nats.Conn
-		jsCtx    nats.JetStreamContext
-		store    store.Store
-		logg     *slog.Logger
+		jsConsumer jetstream.Consumer
+		store      store.Store
+		natsConn   *nats.Conn
+		logg       *slog.Logger
+		durableID  string
 	}
+)
+
+const (
+	pullStream  = "TRACKER"
+	pullSubject = "TRACKER.*"
 )
 
 func NewJetStreamSub(o JetStreamOpts) (Sub, error) {
@@ -38,26 +41,35 @@ func NewJetStreamSub(o JetStreamOpts) (Sub, error) {
 		return nil, err
 	}
 
-	js, err := natsConn.JetStream()
+	js, err := jetstream.New(natsConn)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	stream, err := js.Stream(ctx, pullStream)
+	if err != nil {
+		return nil, err
+	}
+
+	consumer, err := stream.CreateOrUpdateConsumer(ctx, jetstream.ConsumerConfig{
+		Durable:       o.JetStreamID,
+		AckPolicy:     jetstream.AckExplicitPolicy,
+		FilterSubject: pullStream,
+	})
 	if err != nil {
 		return nil, err
 	}
 	o.Logg.Info("successfully connected to NATS server")
 
-	_, err = js.AddConsumer(pullStream, &nats.ConsumerConfig{
-		Durable:       durableId,
-		AckPolicy:     nats.AckExplicitPolicy,
-		FilterSubject: pullSubject,
-	})
-	if err != nil {
-		return nil, err
-	}
-
 	return &JetStreamSub{
-		natsConn: natsConn,
-		jsCtx:    js,
-		store:    o.Store,
-		logg:     o.Logg,
+		jsConsumer: consumer,
+		store:      o.Store,
+		natsConn:   natsConn,
+		logg:       o.Logg,
+		durableID:  o.JetStreamID,
 	}, nil
 }
 
@@ -68,18 +80,8 @@ func (s *JetStreamSub) Close() {
 }
 
 func (s *JetStreamSub) Process() error {
-	subOpts := []nats.SubOpt{
-		nats.ManualAck(),
-		nats.Bind(pullStream, durableId),
-	}
-
-	natsSub, err := s.jsCtx.PullSubscribe(pullSubject, durableId, subOpts...)
-	if err != nil {
-		return err
-	}
-
 	for {
-		events, err := natsSub.Fetch(1)
+		events, err := s.jsConsumer.Fetch(100, jetstream.FetchMaxWait(1*time.Second))
 		if err != nil {
 			if errors.Is(err, nats.ErrTimeout) {
 				continue
@@ -90,9 +92,8 @@ func (s *JetStreamSub) Process() error {
 			}
 		}
 
-		if len(events) > 0 {
-			msg := events[0]
-			if err := s.processEventHandler(context.Background(), msg); err != nil {
+		for msg := range events.Messages() {
+			if err := s.processEventHandler(context.Background(), msg.Subject(), msg.Data()); err != nil {
 				s.logg.Error("error processing nats message", "error", err)
 				msg.Nak()
 			} else {
@@ -102,16 +103,14 @@ func (s *JetStreamSub) Process() error {
 	}
 }
 
-func (s *JetStreamSub) processEventHandler(ctx context.Context, msg *nats.Msg) error {
-	var (
-		chainEvent event.Event
-	)
+func (s *JetStreamSub) processEventHandler(ctx context.Context, msgSubject string, msgData []byte) error {
+	var chainEvent event.Event
 
-	if err := json.Unmarshal(msg.Data, &chainEvent); err != nil {
+	if err := json.Unmarshal(msgData, &chainEvent); err != nil {
 		return err
 	}
 
-	switch msg.Subject {
+	switch msgSubject {
 	case "TRACKER.TOKEN_TRANSFER":
 		if err := s.store.InsertTokenTransfer(ctx, chainEvent); err != nil {
 			return err

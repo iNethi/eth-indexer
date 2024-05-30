@@ -42,16 +42,14 @@ func init() {
 }
 
 func main() {
-	var (
-		wg sync.WaitGroup
-	)
+	var wg sync.WaitGroup
 	ctx, stop := notifyShutdown()
 
 	store, err := store.NewPgStore(store.PgOpts{
+		Logg:                 lo,
 		DSN:                  ko.MustString("postgres.dsn"),
 		MigrationsFolderPath: migrationsFolderFlag,
 		QueriesFolderPath:    queriesFlag,
-		Logg:                 lo,
 	})
 	if err != nil {
 		lo.Error("could not initialize postgres store", "error", err)
@@ -59,9 +57,10 @@ func main() {
 	}
 
 	jetStreamSub, err := sub.NewJetStreamSub(sub.JetStreamOpts{
-		Endpoint: ko.MustString("jetstream.endpoint"),
-		Logg:     lo,
-		Store:    store,
+		Logg:        lo,
+		Store:       store,
+		Endpoint:    ko.MustString("jetstream.endpoint"),
+		JetStreamID: ko.MustString("jetstream.id"),
 	})
 	if err != nil {
 		lo.Error("could not initialize jetstream sub", "error", err)

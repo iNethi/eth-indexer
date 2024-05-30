@@ -1,9 +1,10 @@
 module github.com/grassrootseconomics/celo-indexer
 
-go 1.22.1
+go 1.22.3
 
 require (
-	github.com/jackc/pgx/v5 v5.5.5
+	github.com/grassrootseconomics/celo-tracker v1.0.2-beta
+	github.com/jackc/pgx/v5 v5.6.0
 	github.com/jackc/tern/v2 v2.1.1
 	github.com/kamikazechaser/common v0.2.0
 	github.com/knadh/goyesql/v2 v2.2.0
@@ -36,8 +37,8 @@ require (
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
-	golang.org/x/crypto v0.18.0 // indirect
-	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.16.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/crypto v0.21.0 // indirect
+	golang.org/x/sync v0.7.0 // indirect
+	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/text v0.15.0 // indirect
 )
