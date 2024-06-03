@@ -115,16 +115,28 @@ func (s *JetStreamSub) processEventHandler(ctx context.Context, msgSubject strin
 		if err := s.store.InsertTokenTransfer(ctx, chainEvent); err != nil {
 			return err
 		}
-	case "TRACKER.TOKEN_MINT":
-		if err := s.store.InsertTokenMint(ctx, chainEvent); err != nil {
-			return err
-		}
 	case "TRACKER.POOL_SWAP":
 		if err := s.store.InsertPoolSwap(ctx, chainEvent); err != nil {
 			return err
 		}
+	case "TRACKER.FAUCET_GIVE":
+		if err := s.store.InsertFaucetGive(ctx, chainEvent); err != nil {
+			return err
+		}
 	case "TRACKER.POOL_DEPOSIT":
 		if err := s.store.InsertPoolDeposit(ctx, chainEvent); err != nil {
+			return err
+		}
+	case "TRACKER.TOKEN_MINT":
+		if err := s.store.InsertTokenMint(ctx, chainEvent); err != nil {
+			return err
+		}
+	case "TRACKER.TOKEN_BURN":
+		if err := s.store.InsertTokenBurn(ctx, chainEvent); err != nil {
+			return err
+		}
+	case "TRACKER.QUOTER_PRICE_INDEX_UPDATED":
+		if err := s.store.InsertPriceQuoteUpdate(ctx, chainEvent); err != nil {
 			return err
 		}
 	}
