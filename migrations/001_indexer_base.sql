@@ -1,3 +1,15 @@
+-- fdw extension for remote link
+CREATE EXTENSION IF NOT EXISTS postgres_fdw;
+
+-- link sarafu_network db
+CREATE SCHEMA IF NOT EXISTS sarafu_network;
+CREATE SERVER IF NOT EXISTS sarafu_network_remote FOREIGN DATA WRAPPER postgres_fdw OPTIONS
+    (host '{{.remote_db_host }}', port '{{.remote_db_port }}', dbname '{{.remote_db_name }}');
+CREATE USER MAPPING IF NOT EXISTS FOR postgres SERVER sarafu_network_remote OPTIONS
+    (user '{{.remote_db_user }}', password '{{.remote_db_password }}');
+IMPORT FOREIGN SCHEMA public LIMIT TO (accounts) FROM SERVER sarafu_network_remote INTO sarafu_network;
+
+--
 CREATE TABLE IF NOT EXISTS tx (
   id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   tx_hash VARCHAR(66) NOT NULL UNIQUE,

@@ -106,3 +106,10 @@ INSERT INTO price_index_updates(
     token,
     exchange_rate,
 ) VALUES($1, $2, $3) ON CONFLICT DO NOTHING
+
+--name: address-exists
+-- $1: blockchain_address_1
+-- $2: blockchain_address_2
+SELECT EXISTS(
+    SELECT 1 FROM sarafu_network.accounts WHERE blockchain_address=$1 OR blockchain_address=$2
+)
