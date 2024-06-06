@@ -55,9 +55,8 @@ func NewJetStreamSub(o JetStreamOpts) (Sub, error) {
 	}
 
 	consumer, err := stream.CreateOrUpdateConsumer(ctx, jetstream.ConsumerConfig{
-		Durable:       o.JetStreamID,
-		AckPolicy:     jetstream.AckExplicitPolicy,
-		FilterSubject: pullStream,
+		Durable:   o.JetStreamID,
+		AckPolicy: jetstream.AckExplicitPolicy,
 	})
 	if err != nil {
 		return nil, err

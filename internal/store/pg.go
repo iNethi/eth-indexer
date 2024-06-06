@@ -23,6 +23,7 @@ type (
 	}
 
 	Pg struct {
+		logg    *slog.Logger
 		db      *pgxpool.Pool
 		queries *queries
 	}
@@ -62,6 +63,7 @@ func NewPgStore(o PgOpts) (Store, error) {
 	o.Logg.Info("migrations ran successfully")
 
 	return &Pg{
+		logg:    o.Logg,
 		db:      dbPool,
 		queries: queries,
 	}, nil
@@ -69,20 +71,21 @@ func NewPgStore(o PgOpts) (Store, error) {
 
 func (pg *Pg) InsertTokenTransfer(ctx context.Context, eventPayload event.Event) error {
 	return pg.executeTransaction(ctx, func(tx pgx.Tx) error {
-		var addressExists bool
+		// var addressExists bool
 
-		if err := tx.QueryRow(
-			ctx,
-			pg.queries.CheckAddressExists,
-			eventPayload.Payload["from"].(string),
-			eventPayload.Payload["to"].(string),
-		).Scan(&addressExists); err != nil {
-			return err
-		}
+		// if err := tx.QueryRow(
+		// 	ctx,
+		// 	pg.queries.CheckAddressExists,
+		// 	eventPayload.Payload["from"].(string),
+		// 	eventPayload.Payload["to"].(string),
+		// ).Scan(&addressExists); err != nil {
+		// 	return err
+		// }
 
-		if !addressExists {
-			return nil
-		}
+		// if !addressExists {
+		// 	return nil
+		// }
+		// pg.logg.Debug("transfer address exists", "hash", eventPayload.TxHash)
 
 		txID, err := pg.insertTx(ctx, tx, eventPayload)
 		if err != nil {
@@ -278,7 +281,7 @@ func runMigrations(ctx context.Context, dbPool *pgxpool.Pool, migrationsPath str
 		}
 	}
 
-	const migratorTimeout = 5 * time.Second
+	const migratorTimeout = 15 * time.Second
 
 	ctx, cancel := context.WithTimeout(ctx, migratorTimeout)
 	defer cancel()
