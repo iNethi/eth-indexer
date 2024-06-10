@@ -8,26 +8,15 @@ services:
       - POSTGRES_USER=postgres
     volumes:
       - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
-      - celo-indexer-pg:/var/lib/postgresql/data
+      - indexer-pg:/var/lib/postgresql/data
     ports:
       - "127.0.0.1:5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 10s
       timeout: 5s
-      retries: 5   
-  celo-indexer:
-    image: celo-indexer:latest
-    restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-    # Point to the correct celo-tracker JetStream instance
-      - INDEXER_JETSTREAM__ENDPOINT=nats://nats:4222
-    ports:
-      - 127.0.0.1:5002:5002
-      
+      retries: 5
+
 volumes:
-  celo-indexer-pg:
+  indexer-pg:
     driver: local
