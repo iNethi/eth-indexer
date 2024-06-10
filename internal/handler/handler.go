@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/grassrootseconomics/celo-indexer/internal/cache"
 	"github.com/grassrootseconomics/celo-indexer/internal/store"
 	"github.com/grassrootseconomics/celo-tracker/pkg/event"
 )
@@ -12,19 +11,19 @@ import (
 type (
 	HandlerOpts struct {
 		Store store.Store
-		Cache *cache.Cache
+		// Cache *cache.Cache
 	}
 
 	Handler struct {
 		store store.Store
-		cache *cache.Cache
+		// cache *cache.Cache
 	}
 )
 
 func NewHandler(o HandlerOpts) *Handler {
 	return &Handler{
 		store: o.Store,
-		cache: o.Cache,
+		// cache: o.Cache,
 	}
 }
 
@@ -37,12 +36,13 @@ func (h *Handler) Handle(ctx context.Context, msgSubject string, msgData []byte)
 
 	switch msgSubject {
 	case "TRACKER.TOKEN_TRANSFER":
-		from := chainEvent.Payload["from"].(string)
-		to := chainEvent.Payload["to"].(string)
+		// from := chainEvent.Payload["from"].(string)
+		// to := chainEvent.Payload["to"].(string)
 
-		if h.cache.Exists(from) || h.cache.Exists(to) {
-			return h.store.InsertTokenTransfer(ctx, chainEvent)
-		}
+		// if h.cache.Exists(from) || h.cache.Exists(to) {
+		// 	return h.store.InsertTokenTransfer(ctx, chainEvent)
+		// }
+		return h.store.InsertTokenTransfer(ctx, chainEvent)
 	case "TRACKER.POOL_SWAP":
 		return h.store.InsertPoolSwap(ctx, chainEvent)
 	case "TRACKER.FAUCET_GIVE":

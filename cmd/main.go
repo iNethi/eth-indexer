@@ -11,8 +11,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/grassrootseconomics/celo-indexer/internal/cache"
-	"github.com/grassrootseconomics/celo-indexer/internal/chain"
 	"github.com/grassrootseconomics/celo-indexer/internal/handler"
 	"github.com/grassrootseconomics/celo-indexer/internal/store"
 	"github.com/grassrootseconomics/celo-indexer/internal/sub"
@@ -48,22 +46,22 @@ func main() {
 	var wg sync.WaitGroup
 	ctx, stop := notifyShutdown()
 
-	chain, err := chain.NewChainProvider(chain.ChainOpts{
-		RPCEndpoint: ko.MustString("chain.rpc_endpoint"),
-		ChainID:     ko.MustInt64("chain.chainid"),
-	})
-	if err != nil {
-		lo.Error("chain provider bootstrap failed", "error", err)
-		os.Exit(1)
-	}
-	cache := cache.NewCache()
+	// chain, err := chain.NewChainProvider(chain.ChainOpts{
+	// 	RPCEndpoint: ko.MustString("chain.rpc_endpoint"),
+	// 	ChainID:     ko.MustInt64("chain.chainid"),
+	// })
+	// if err != nil {
+	// 	lo.Error("chain provider bootstrap failed", "error", err)
+	// 	os.Exit(1)
+	// }
+	// cache := cache.NewCache()
 
-	lo.Info("starting cache bootstrap this may take a few minutes")
-	if err := chain.BootstrapCache(ko.MustStrings("bootstrap.ge_registries"), cache); err != nil {
-		lo.Error("cache bootstrap failed", "error", err)
-		os.Exit(1)
-	}
-	lo.Info("cache bootstrap completed successfully", "cache_size", cache.Size())
+	// lo.Info("starting cache bootstrap this may take a few minutes")
+	// if err := chain.BootstrapCache(ko.MustStrings("bootstrap.ge_registries"), cache); err != nil {
+	// 	lo.Error("cache bootstrap failed", "error", err)
+	// 	os.Exit(1)
+	// }
+	// lo.Info("cache bootstrap completed successfully", "cache_size", cache.Size())
 
 	store, err := store.NewPgStore(store.PgOpts{
 		Logg:                 lo,
@@ -78,7 +76,7 @@ func main() {
 
 	handler := handler.NewHandler(handler.HandlerOpts{
 		Store: store,
-		Cache: cache,
+		// Cache: cache,
 	})
 
 	jetStreamSub, err := sub.NewJetStreamSub(sub.JetStreamOpts{
