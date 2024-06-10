@@ -7,11 +7,11 @@ ARG TARGETPLATFORM
 ARG BUILD=dev
 
 RUN echo "Building on $BUILDPLATFORM, building for $TARGETPLATFORM"
-WORKDIR /build
+WORKDIR /code
 
 COPY . .
 RUN go mod download
-RUN go build -o celo-indexer -ldflags="-X main.build=${BUILD} -s -w" cmd/*
+RUN go build -o /build/celo-indexer -ldflags="-X main.build=${BUILD} -s -w" cmd/*
 
 FROM debian:bookworm-slim
 
@@ -21,6 +21,10 @@ WORKDIR /service
 
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=build /build/* .
+COPY migrations migrations/
+COPY config.toml .
+COPY queries.sql .
+COPY LICENSE .
 
 EXPOSE 5002
 
