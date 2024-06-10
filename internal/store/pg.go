@@ -71,22 +71,6 @@ func NewPgStore(o PgOpts) (Store, error) {
 
 func (pg *Pg) InsertTokenTransfer(ctx context.Context, eventPayload event.Event) error {
 	return pg.executeTransaction(ctx, func(tx pgx.Tx) error {
-		// var addressExists bool
-
-		// if err := tx.QueryRow(
-		// 	ctx,
-		// 	pg.queries.CheckAddressExists,
-		// 	eventPayload.Payload["from"].(string),
-		// 	eventPayload.Payload["to"].(string),
-		// ).Scan(&addressExists); err != nil {
-		// 	return err
-		// }
-
-		// if !addressExists {
-		// 	return nil
-		// }
-		// pg.logg.Debug("transfer address exists", "hash", eventPayload.TxHash)
-
 		txID, err := pg.insertTx(ctx, tx, eventPayload)
 		if err != nil {
 			return err
@@ -271,16 +255,6 @@ func loadQueries(queriesPath string) (*queries, error) {
 }
 
 func runMigrations(ctx context.Context, dbPool *pgxpool.Pool, migrationsPath string) error {
-	// Safety check
-	// https://github.com/jackc/tern/issues/98
-	envVars := []string{"REMOTE_DB_HOST", "REMOTE_DB_PORT", "REMOTE_DB_NAME", "REMOTE_DB_USER", "REMOTE_DB_PASSWORD"}
-	for _, envVar := range envVars {
-		_, exists := os.LookupEnv(envVar)
-		if !exists {
-			return fmt.Errorf("required env var %s not set", envVar)
-		}
-	}
-
 	const migratorTimeout = 15 * time.Second
 
 	ctx, cancel := context.WithTimeout(ctx, migratorTimeout)

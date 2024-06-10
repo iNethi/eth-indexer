@@ -2,13 +2,12 @@ package sub
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"log/slog"
 	"time"
 
+	"github.com/grassrootseconomics/celo-indexer/internal/handler"
 	"github.com/grassrootseconomics/celo-indexer/internal/store"
-	"github.com/grassrootseconomics/celo-tracker/pkg/event"
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/jetstream"
 )
@@ -17,6 +16,7 @@ type (
 	JetStreamOpts struct {
 		Store       store.Store
 		Logg        *slog.Logger
+		Handler     *handler.Handler
 		Endpoint    string
 		JetStreamID string
 	}
@@ -24,6 +24,7 @@ type (
 	JetStreamSub struct {
 		jsConsumer jetstream.Consumer
 		store      store.Store
+		handler    *handler.Handler
 		natsConn   *nats.Conn
 		logg       *slog.Logger
 		durableID  string
@@ -66,6 +67,7 @@ func NewJetStreamSub(o JetStreamOpts) (Sub, error) {
 	return &JetStreamSub{
 		jsConsumer: consumer,
 		store:      o.Store,
+		handler:    o.Handler,
 		natsConn:   natsConn,
 		logg:       o.Logg,
 		durableID:  o.JetStreamID,
@@ -92,7 +94,7 @@ func (s *JetStreamSub) Process() error {
 		}
 
 		for msg := range events.Messages() {
-			if err := s.processEventHandler(context.Background(), msg.Subject(), msg.Data()); err != nil {
+			if err := s.handler.Handle(context.Background(), msg.Subject(), msg.Data()); err != nil {
 				s.logg.Error("error processing nats message", "error", err)
 				msg.Nak()
 			} else {
@@ -100,45 +102,4 @@ func (s *JetStreamSub) Process() error {
 			}
 		}
 	}
-}
-
-func (s *JetStreamSub) processEventHandler(ctx context.Context, msgSubject string, msgData []byte) error {
-	var chainEvent event.Event
-
-	if err := json.Unmarshal(msgData, &chainEvent); err != nil {
-		return err
-	}
-
-	switch msgSubject {
-	case "TRACKER.TOKEN_TRANSFER":
-		if err := s.store.InsertTokenTransfer(ctx, chainEvent); err != nil {
-			return err
-		}
-	case "TRACKER.POOL_SWAP":
-		if err := s.store.InsertPoolSwap(ctx, chainEvent); err != nil {
-			return err
-		}
-	case "TRACKER.FAUCET_GIVE":
-		if err := s.store.InsertFaucetGive(ctx, chainEvent); err != nil {
-			return err
-		}
-	case "TRACKER.POOL_DEPOSIT":
-		if err := s.store.InsertPoolDeposit(ctx, chainEvent); err != nil {
-			return err
-		}
-	case "TRACKER.TOKEN_MINT":
-		if err := s.store.InsertTokenMint(ctx, chainEvent); err != nil {
-			return err
-		}
-	case "TRACKER.TOKEN_BURN":
-		if err := s.store.InsertTokenBurn(ctx, chainEvent); err != nil {
-			return err
-		}
-	case "TRACKER.QUOTER_PRICE_INDEX_UPDATED":
-		if err := s.store.InsertPriceQuoteUpdate(ctx, chainEvent); err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
