@@ -65,7 +65,6 @@ CREATE TABLE IF NOT EXISTS price_index_updates (
   exchange_rate NUMERIC NOT NULL
 );
 
-
 CREATE TABLE IF NOT EXISTS contracts (
   id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   contract_address VARCHAR(42) UNIQUE NOT NULL,

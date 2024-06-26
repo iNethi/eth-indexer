@@ -37,7 +37,6 @@ type (
 		InsertPoolSwap         string `query:"insert-pool-swap"`
 		InsertPoolDeposit      string `query:"insert-pool-deposit"`
 		InsertPriceQuoteUpdate string `query:"insert-price-quote-update"`
-		CheckAddressExists     string `query:"address-exists"`
 	}
 )
 
@@ -87,6 +86,7 @@ func (pg *Pg) InsertTokenTransfer(ctx context.Context, eventPayload event.Event)
 			eventPayload.Payload["from"].(string),
 			eventPayload.Payload["to"].(string),
 			eventPayload.Payload["value"].(string),
+			eventPayload.ContractAddress,
 		)
 		return err
 	})
@@ -106,6 +106,7 @@ func (pg *Pg) InsertTokenMint(ctx context.Context, eventPayload event.Event) err
 			eventPayload.Payload["tokenMinter"].(string),
 			eventPayload.Payload["to"].(string),
 			eventPayload.Payload["value"].(string),
+			eventPayload.ContractAddress,
 		)
 		return err
 	})
@@ -124,6 +125,7 @@ func (pg *Pg) InsertTokenBurn(ctx context.Context, eventPayload event.Event) err
 			txID,
 			eventPayload.Payload["tokenBurner"].(string),
 			eventPayload.Payload["value"].(string),
+			eventPayload.ContractAddress,
 		)
 		return err
 	})
@@ -143,6 +145,7 @@ func (pg *Pg) InsertFaucetGive(ctx context.Context, eventPayload event.Event) er
 			eventPayload.Payload["token"].(string),
 			eventPayload.Payload["recipient"].(string),
 			eventPayload.Payload["amount"].(string),
+			eventPayload.ContractAddress,
 		)
 		return err
 	})
@@ -165,6 +168,7 @@ func (pg *Pg) InsertPoolSwap(ctx context.Context, eventPayload event.Event) erro
 			eventPayload.Payload["amountIn"].(string),
 			eventPayload.Payload["amountOut"].(string),
 			eventPayload.Payload["fee"].(string),
+			eventPayload.ContractAddress,
 		)
 		return err
 	})
@@ -184,6 +188,7 @@ func (pg *Pg) InsertPoolDeposit(ctx context.Context, eventPayload event.Event) e
 			eventPayload.Payload["initiator"].(string),
 			eventPayload.Payload["tokenIn"].(string),
 			eventPayload.Payload["amountIn"].(string),
+			eventPayload.ContractAddress,
 		)
 		return err
 	})
@@ -202,6 +207,7 @@ func (pg *Pg) InsertPriceQuoteUpdate(ctx context.Context, eventPayload event.Eve
 			txID,
 			eventPayload.Payload["token"].(string),
 			eventPayload.Payload["exchangeRate"].(string),
+			eventPayload.ContractAddress,
 		)
 		return err
 	})
@@ -214,7 +220,6 @@ func (pg *Pg) insertTx(ctx context.Context, tx pgx.Tx, eventPayload event.Event)
 		pg.queries.InsertTx,
 		eventPayload.TxHash,
 		eventPayload.Block,
-		eventPayload.ContractAddress,
 		time.Unix(int64(eventPayload.Timestamp), 0).UTC(),
 		eventPayload.Success,
 	).Scan(&txID); err != nil {
