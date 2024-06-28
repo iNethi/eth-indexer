@@ -86,7 +86,8 @@ INSERT INTO pool_swap(
     token_out_address,
     in_value,
     out_value,
-    fee
+    fee,
+    contract_address
 ) VALUES($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT DO NOTHING
 
 --name: insert-pool-deposit
