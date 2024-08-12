@@ -112,6 +112,6 @@ INSERT INTO pool_deposit(
 INSERT INTO price_index_updates(
     tx_id,
     token,
-    exchange_rate.
+    exchange_rate,
     contract_address
 ) VALUES($1, $2, $3, $4) ON CONFLICT DO NOTHING
