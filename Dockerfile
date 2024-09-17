@@ -11,7 +11,7 @@ WORKDIR /code
 
 COPY . .
 RUN go mod download
-RUN go build -o /build/celo-indexer -ldflags="-X main.build=${BUILD} -s -w" cmd/*
+RUN go build -o /build/celo-indexer -ldflags="-X main.build=${BUILD} -s -w" cmd/service/main.go
 
 FROM debian:bookworm-slim
 
