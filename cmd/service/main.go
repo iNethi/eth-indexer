@@ -16,6 +16,7 @@ import (
 	"github.com/grassrootseconomics/celo-indexer/internal/handler"
 	"github.com/grassrootseconomics/celo-indexer/internal/store"
 	"github.com/grassrootseconomics/celo-indexer/internal/sub"
+	"github.com/grassrootseconomics/celo-indexer/internal/util"
 	"github.com/knadh/koanf/v2"
 )
 
@@ -38,8 +39,8 @@ func init() {
 	flag.StringVar(&queriesFlag, "queries", "queries.sql", "Queries file location")
 	flag.Parse()
 
-	lo = initLogger()
-	ko = initConfig()
+	lo = util.InitLogger()
+	ko = util.InitConfig(lo, confFlag)
 
 	lo.Info("starting celo indexer", "build", build)
 }
