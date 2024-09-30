@@ -6,8 +6,8 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/grassrootseconomics/celo-indexer/internal/handler"
-	"github.com/grassrootseconomics/celo-indexer/internal/store"
+	"github.com/grassrootseconomics/eth-indexer/internal/handler"
+	"github.com/grassrootseconomics/eth-indexer/internal/store"
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/jetstream"
 )

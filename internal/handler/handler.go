@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/grassrootseconomics/celo-indexer/internal/store"
 	"github.com/grassrootseconomics/celo-tracker/pkg/event"
+	"github.com/grassrootseconomics/eth-indexer/internal/store"
 )
 
 type (

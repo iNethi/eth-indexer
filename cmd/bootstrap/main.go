@@ -7,13 +7,14 @@ import (
 	"os"
 	"time"
 
-	"github.com/celo-org/celo-blockchain/common"
-	"github.com/grassrootseconomics/celo-indexer/internal/util"
-	"github.com/grassrootseconomics/celoutils/v3"
-	"github.com/grassrootseconomics/w3-celo"
-	"github.com/grassrootseconomics/w3-celo/module/eth"
+	"github.com/grassrootseconomics/eth-indexer/internal/util"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/knadh/koanf/v2"
+
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/grassrootseconomics/ethutils"
+	"github.com/lmittmann/w3"
+	"github.com/lmittmann/w3/module/eth"
 )
 
 type TokenArgs struct {
@@ -61,7 +62,7 @@ func main() {
 		decimalsGetter      = w3.MustNewFunc("decimals()", "uint8")
 	)
 
-	chainProvider := celoutils.NewProvider(ko.MustString("chain.rpc_endpoint"), ko.MustInt64("chain.chainid"))
+	chainProvider := ethutils.NewProvider(ko.MustString("chain.rpc_endpoint"), ko.MustInt64("chain.chainid"))
 
 	var err error
 	dbPool, err = newPgStore()
@@ -74,13 +75,13 @@ func main() {
 	defer cancel()
 
 	for _, registry := range ko.MustStrings("bootstrap.ge_registries") {
-		registryMap, err := chainProvider.RegistryMap(ctx, celoutils.HexToAddress(registry))
+		registryMap, err := chainProvider.RegistryMap(ctx, ethutils.HexToAddress(registry))
 		if err != nil {
 			lo.Error("could not fetch registry", "error", err)
 			os.Exit(1)
 		}
 
-		if tokenIndex := registryMap[celoutils.TokenIndex]; tokenIndex != celoutils.ZeroAddress {
+		if tokenIndex := registryMap[ethutils.TokenIndex]; tokenIndex != ethutils.ZeroAddress {
 			tokenIndexIter, err := chainProvider.NewBatchIterator(ctx, tokenIndex)
 			if err != nil {
 				lo.Error("could not create token index iter", "error", err)
@@ -98,7 +99,7 @@ func main() {
 				}
 				lo.Debug("index batch", "index", tokenIndex.Hex(), "size", len(batch))
 				for _, address := range batch {
-					if address != celoutils.ZeroAddress {
+					if address != ethutils.ZeroAddress {
 						var (
 							tokenName     string
 							tokenSymbol   string
@@ -130,7 +131,7 @@ func main() {
 			}
 		}
 
-		if poolIndex := registryMap[celoutils.PoolIndex]; poolIndex != celoutils.ZeroAddress {
+		if poolIndex := registryMap[ethutils.PoolIndex]; poolIndex != ethutils.ZeroAddress {
 			poolIndexIter, err := chainProvider.NewBatchIterator(ctx, poolIndex)
 			if err != nil {
 				lo.Error("cache could create pool index iter", "error", err)
@@ -157,7 +158,7 @@ func main() {
 						lo.Error("error fetching pool token index and/or quoter", "error", err)
 						os.Exit(1)
 					}
-					if poolTokenIndex != celoutils.ZeroAddress {
+					if poolTokenIndex != ethutils.ZeroAddress {
 						poolTokenIndexIter, err := chainProvider.NewBatchIterator(ctx, poolTokenIndex)
 						if err != nil {
 							lo.Error("error creating pool token index iter", "error", err)
@@ -175,7 +176,7 @@ func main() {
 							}
 							lo.Debug("index batch", "index", poolTokenIndex.Hex(), "size", len(batch))
 							for _, address := range batch {
-								if address != celoutils.ZeroAddress {
+								if address != ethutils.ZeroAddress {
 									var (
 										tokenName     string
 										tokenSymbol   string

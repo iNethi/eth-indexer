@@ -22,7 +22,7 @@ We provide pre-built images for `linux/amd64`. See the packages tab on Github.
 If you are on any other platform:
 
 ```bash
-git clone https://github.com/grassrootseconomics/celo-indexer.git
+git clone https://github.com/grassrootseconomics/eth-indexer.git
 cd celo-indexer
 docker buildx build --build-arg BUILD=$(git rev-parse --short HEAD) --tag celo-indexer:$(git rev-parse --short HEAD) --tag celo-indexer:latest .
 docker images
