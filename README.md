@@ -1,8 +1,8 @@
-# celo-indexer
+# eth-indexer
 
-![GitHub Tag](https://img.shields.io/github/v/tag/grassrootseconomics/celo-indexer)
+![GitHub Tag](https://img.shields.io/github/v/tag/grassrootseconomics/eth-indexer)
 
-A lightweight Postgres chain indexer designed to couple with [celo-tracker](https://github.com/grassrootseconomics/celo-tracker) to index all relevant GE related blockchain data on the Celo blockchain.
+A lightweight Postgres chain indexer designed to couple with [eth-tracker](https://github.com/grassrootseconomics/eth-tracker) to index all relevant GE related blockchain data on any EVM chain.
 
 ## Getting Started
 
@@ -11,7 +11,7 @@ A lightweight Postgres chain indexer designed to couple with [celo-tracker](http
 * Git
 * Docker
 * Postgres server
-* Access to a `celo-tracker` instance
+* Access to a `eth-tracker` instance
 
 See [docker-compose.yaml](dev/docker-compose.yaml) for an example on how to run and deploy a single instance.
 
@@ -23,8 +23,8 @@ If you are on any other platform:
 
 ```bash
 git clone https://github.com/grassrootseconomics/eth-indexer.git
-cd celo-indexer
-docker buildx build --build-arg BUILD=$(git rev-parse --short HEAD) --tag celo-indexer:$(git rev-parse --short HEAD) --tag celo-indexer:latest .
+cd eth-indexer
+docker buildx build --build-arg BUILD=$(git rev-parse --short HEAD) --tag eth-indexer:$(git rev-parse --short HEAD) --tag eth-indexer:latest .
 docker images
 ```
 
