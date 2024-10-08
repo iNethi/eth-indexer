@@ -3,7 +3,7 @@ module github.com/grassrootseconomics/eth-indexer
 go 1.22.3
 
 require (
-	github.com/VictoriaMetrics/metrics v1.33.1
+	github.com/VictoriaMetrics/metrics v1.35.1
 	github.com/ethereum/go-ethereum v1.14.8
 	github.com/grassrootseconomics/celo-tracker v1.0.2-beta
 	github.com/grassrootseconomics/ethutils v1.3.0
