@@ -3,7 +3,8 @@ package store
 import (
 	"context"
 
-	"github.com/grassrootseconomics/celo-tracker/pkg/event"
+	"github.com/grassrootseconomics/eth-tracker/pkg/event"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type (
@@ -15,6 +16,7 @@ type (
 		InsertPoolSwap(context.Context, event.Event) error
 		InsertPoolDeposit(context.Context, event.Event) error
 		InsertPriceQuoteUpdate(context.Context, event.Event) error
+		Pool() *pgxpool.Pool
 		Close()
 	}
 )

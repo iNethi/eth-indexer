@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/grassrootseconomics/celo-tracker/pkg/event"
+	"github.com/grassrootseconomics/eth-tracker/pkg/event"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/tern/v2/migrate"
@@ -70,6 +70,10 @@ func NewPgStore(o PgOpts) (Store, error) {
 
 func (pg *Pg) Close() {
 	pg.db.Close()
+}
+
+func (pg *Pg) Pool() *pgxpool.Pool {
+	return pg.db
 }
 
 func (pg *Pg) InsertTokenTransfer(ctx context.Context, eventPayload event.Event) error {

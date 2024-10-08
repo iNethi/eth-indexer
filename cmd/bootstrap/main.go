@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/grassrootseconomics/eth-indexer/internal/store"
 	"github.com/grassrootseconomics/eth-indexer/internal/util"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/knadh/koanf/v2"
@@ -36,7 +37,9 @@ const (
 var (
 	build = "dev"
 
-	confFlag string
+	confFlag             string
+	migrationsFolderFlag string
+	queriesFlag          string
 
 	lo *slog.Logger
 	ko *koanf.Koanf
@@ -46,6 +49,8 @@ var (
 
 func init() {
 	flag.StringVar(&confFlag, "config", "config.toml", "Config file location")
+	flag.StringVar(&migrationsFolderFlag, "migrations", "migrations/", "Migrations folder location")
+	flag.StringVar(&queriesFlag, "queries", "queries.sql", "Queries file location")
 	flag.Parse()
 
 	lo = util.InitLogger()
@@ -215,17 +220,18 @@ func main() {
 }
 
 func newPgStore() (*pgxpool.Pool, error) {
-	parsedConfig, err := pgxpool.ParseConfig(ko.MustString("postgres.dsn"))
+	store, err := store.NewPgStore(store.PgOpts{
+		Logg:                 lo,
+		DSN:                  ko.MustString("postgres.dsn"),
+		MigrationsFolderPath: migrationsFolderFlag,
+		QueriesFolderPath:    queriesFlag,
+	})
 	if err != nil {
-		return nil, err
+		lo.Error("could not initialize postgres store", "error", err)
+		os.Exit(1)
 	}
 
-	dbPool, err := pgxpool.NewWithConfig(context.Background(), parsedConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	return dbPool, nil
+	return store.Pool(), nil
 }
 
 func insertToken(ctx context.Context, insertArgs TokenArgs) error {
