@@ -6,7 +6,7 @@ import (
 )
 
 func bootstrapRouter(handlerContainer *handler.Handler) *router.Router {
-	router := router.New()
+	router := router.New(lo)
 
 	router.RegisterRoute(
 		"TRACKER.TOKEN_TRANSFER",

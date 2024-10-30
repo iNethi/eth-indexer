@@ -13,8 +13,8 @@ type (
 	}
 
 	Telegram struct {
-		client               *tg.Client
-		notificaationChannel int64
+		client              *tg.Client
+		notificationChannel int64
 	}
 )
 
@@ -25,13 +25,13 @@ const (
 
 func New(o TelegramOpts) *Telegram {
 	return &Telegram{
-		client:               tg.New(o.BotToken, nil),
-		notificaationChannel: o.NotificationChannel,
+		client:              tg.New(o.BotToken),
+		notificationChannel: o.NotificationChannel,
 	}
 }
 
 func (t *Telegram) Notify(ctx context.Context, message string) error {
-	_, err := t.client.SendMessage(tg.ChatID(t.notificaationChannel), message).Do(ctx)
+	_, err := t.client.SendMessage(tg.ChatID(t.notificationChannel), message).Do(ctx)
 	return err
 
 }

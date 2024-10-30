@@ -96,6 +96,7 @@ func (s *JetStreamSub) Process() error {
 			}
 		}
 
+		s.logg.Info("processing nats message", "subject", msg.Subject())
 		if err := s.router.Handle(context.Background(), msg); err != nil {
 			s.logg.Error("router: error processing nats message", "error", err)
 		}

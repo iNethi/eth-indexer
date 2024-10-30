@@ -15,6 +15,10 @@ id = "celo-indexer-1"
 rpc_endpoint = "http://localhost:8545"
 chainid = 1337
 
+[telegram]
+bot_token = ""
+notification_channel = -1
+
 [bootstrap]
 # This will bootstrap the cache on which addresses to track
 ge_registries = ["0xE979a64D375F5D363d7cecF3c93B9aFD40Ba9f55"]

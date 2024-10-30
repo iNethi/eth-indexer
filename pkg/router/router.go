@@ -19,9 +19,10 @@ type (
 	}
 )
 
-func New() *Router {
+func New(logg *slog.Logger) *Router {
 	return &Router{
 		handlers: make(map[string][]HandlerFunc),
+		logg:     logg,
 	}
 }
 
@@ -32,7 +33,8 @@ func (r *Router) RegisterRoute(subject string, handlerFunc ...HandlerFunc) {
 func (r *Router) Handle(ctx context.Context, msg jetstream.Msg) error {
 	handlers, ok := r.handlers[msg.Subject()]
 	if !ok {
-		return nil
+		r.logg.Debug("handler not found sending ack", "subject", msg.Subject())
+		return msg.Ack()
 	}
 
 	var chainEvent event.Event
@@ -49,7 +51,11 @@ func (r *Router) Handle(ctx context.Context, msg jetstream.Msg) error {
 	}
 
 	if err := p.Wait(); err != nil {
-		return msg.Nak()
+		r.logg.Error("handler error sending nack", "subject", msg.Subject(), "error", err)
+		if err := msg.Nak(); err != nil {
+			return err
+		}
+		return err
 	}
 
 	return msg.Ack()
