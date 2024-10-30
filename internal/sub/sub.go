@@ -1,8 +1,6 @@
 package sub
 
-type (
-	Sub interface {
-		Process() error
-		Close()
-	}
-)
+type Sub interface {
+	Process() error
+	Close()
+}

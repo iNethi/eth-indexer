@@ -6,27 +6,24 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/grassrootseconomics/eth-indexer/internal/handler"
-	"github.com/grassrootseconomics/eth-indexer/internal/store"
+	"github.com/grassrootseconomics/eth-indexer/pkg/router"
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/jetstream"
 )
 
 type (
 	JetStreamOpts struct {
-		Store       store.Store
-		Logg        *slog.Logger
-		Handler     *handler.Handler
 		Endpoint    string
 		JetStreamID string
+		Logg        *slog.Logger
+		Router      *router.Router
 	}
 
 	JetStreamSub struct {
 		jsConsumer jetstream.Consumer
-		store      store.Store
-		handler    *handler.Handler
-		natsConn   *nats.Conn
 		logg       *slog.Logger
+		natsConn   *nats.Conn
+		router     *router.Router
 		durableID  string
 	}
 )
@@ -66,8 +63,7 @@ func NewJetStreamSub(o JetStreamOpts) (Sub, error) {
 
 	return &JetStreamSub{
 		jsConsumer: consumer,
-		store:      o.Store,
-		handler:    o.Handler,
+		router:     o.Router,
 		natsConn:   natsConn,
 		logg:       o.Logg,
 		durableID:  o.JetStreamID,
@@ -81,10 +77,17 @@ func (s *JetStreamSub) Close() {
 }
 
 func (s *JetStreamSub) Process() error {
+	iter, err := s.jsConsumer.Messages(jetstream.WithMessagesErrOnMissingHeartbeat(false))
+	if err != nil {
+		return err
+	}
+	defer iter.Stop()
+
 	for {
-		events, err := s.jsConsumer.Fetch(100, jetstream.FetchMaxWait(1*time.Second))
+		msg, err := iter.Next()
 		if err != nil {
 			if errors.Is(err, nats.ErrTimeout) {
+				s.logg.Error("jetstream: iter fetch timeout")
 				continue
 			} else if errors.Is(err, nats.ErrConnectionClosed) {
 				return nil
@@ -93,13 +96,8 @@ func (s *JetStreamSub) Process() error {
 			}
 		}
 
-		for msg := range events.Messages() {
-			if err := s.handler.Handle(context.Background(), msg.Subject(), msg.Data()); err != nil {
-				s.logg.Error("error processing nats message", "error", err)
-				msg.Nak()
-			} else {
-				msg.Ack()
-			}
+		if err := s.router.Handle(context.Background(), msg); err != nil {
+			s.logg.Error("router: error processing nats message", "error", err)
 		}
 	}
 }

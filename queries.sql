@@ -104,14 +104,48 @@ INSERT INTO pool_deposit(
     contract_address
 ) VALUES($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING
 
---name: insert-price-quote-update
--- $1: tx_id
--- $2: token
--- $3: exchange_rate
--- $4: contract_address
-INSERT INTO price_index_updates(
-    tx_id,
-    token,
-    exchange_rate,
-    contract_address
-) VALUES($1, $2, $3, $4) ON CONFLICT DO NOTHING
+--name: insert-token
+-- $1: contract_address
+-- $2: token_name
+-- $3: token_symbol
+-- $4: token_decimals
+-- $5: sink_address
+INSERT INTO tokens(
+	contract_address,
+	token_name,
+	token_symbol,
+	token_decimals,
+    sink_address
+) VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING
+
+--name: insert-pool
+-- $1: contract_address
+-- $2: pool_name
+-- $3: pool_symbol
+INSERT INTO tokens(
+	contract_address,
+    pool_name,
+    pool_symbol
+) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING
+
+--name: last-10-tx
+-- Fetches an account's last 10 transfers
+-- $1: public_key
+SELECT
+token_transfer.sender_address AS sender, token_transfer.recipient_address AS recipient, token_transfer.transfer_value, token_transfer.contract_address,
+tx.tx_hash, tx.date_block,
+tokens.token_symbol, tokens.token_decimals
+FROM token_transfer
+INNER JOIN tx ON token_transfer.tx_id = tx.id
+INNER JOIN tokens ON token_transfer.contract_address = tokens.contract_address
+WHERE token_transfer.sender_address = $1 OR token_transfer.recipient_address = $1
+ORDER BY tx.date_block DESC
+LIMIT 10;
+
+--name: token-holdings
+-- Fetches an account's token holdings
+-- $1: public_key
+SELECT DISTINCT tokens.token_symbol, tokens.contract_address, tokens.token_decimals FROM tokens
+INNER JOIN token_transfer on tokens.contract_address = token_transfer.contract_address
+WHERE token_transfer.sender_address = $1
+OR token_transfer.recipient_address = $1;

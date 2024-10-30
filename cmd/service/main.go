@@ -13,10 +13,13 @@ import (
 	"time"
 
 	"github.com/grassrootseconomics/eth-indexer/internal/api"
+	"github.com/grassrootseconomics/eth-indexer/internal/cache"
 	"github.com/grassrootseconomics/eth-indexer/internal/handler"
 	"github.com/grassrootseconomics/eth-indexer/internal/store"
 	"github.com/grassrootseconomics/eth-indexer/internal/sub"
+	"github.com/grassrootseconomics/eth-indexer/internal/telegram"
 	"github.com/grassrootseconomics/eth-indexer/internal/util"
+	"github.com/grassrootseconomics/ethutils"
 	"github.com/knadh/koanf/v2"
 )
 
@@ -60,14 +63,31 @@ func main() {
 		os.Exit(1)
 	}
 
-	handler := handler.NewHandler(handler.HandlerOpts{
-		Store: store,
+	cache := cache.New()
+
+	chainProvider := ethutils.NewProvider(
+		ko.MustString("chain.rpc_endpoint"),
+		ko.MustInt64("chain.chainid"),
+	)
+
+	telegram := telegram.New(telegram.TelegramOpts{
+		BotToken:            ko.MustString("telegram.bot_token"),
+		NotificationChannel: ko.MustInt64("telegram.notification_channel"),
 	})
+
+	handlerContainer := handler.NewHandler(handler.HandlerOpts{
+		Store:         store,
+		Cache:         cache,
+		ChainProvider: chainProvider,
+		Telegram:      telegram,
+		Logg:          lo,
+	})
+
+	router := bootstrapRouter(handlerContainer)
 
 	jetStreamSub, err := sub.NewJetStreamSub(sub.JetStreamOpts{
 		Logg:        lo,
-		Store:       store,
-		Handler:     handler,
+		Router:      router,
 		Endpoint:    ko.MustString("jetstream.endpoint"),
 		JetStreamID: ko.MustString("jetstream.id"),
 	})

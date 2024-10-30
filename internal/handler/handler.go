@@ -1,52 +1,38 @@
 package handler
 
 import (
-	"context"
-	"encoding/json"
+	"log/slog"
 
+	"github.com/grassrootseconomics/eth-indexer/internal/cache"
 	"github.com/grassrootseconomics/eth-indexer/internal/store"
-	"github.com/grassrootseconomics/eth-tracker/pkg/event"
+	"github.com/grassrootseconomics/eth-indexer/internal/telegram"
+	"github.com/grassrootseconomics/ethutils"
 )
 
 type (
 	HandlerOpts struct {
-		Store store.Store
+		Store         store.Store
+		Cache         *cache.Cache
+		ChainProvider *ethutils.Provider
+		Telegram      *telegram.Telegram
+		Logg          *slog.Logger
 	}
 
 	Handler struct {
-		store store.Store
+		store         store.Store
+		cache         *cache.Cache
+		chainProvider *ethutils.Provider
+		telegram      *telegram.Telegram
+		logg          *slog.Logger
 	}
 )
 
 func NewHandler(o HandlerOpts) *Handler {
 	return &Handler{
-		store: o.Store,
+		store:         o.Store,
+		cache:         o.Cache,
+		chainProvider: o.ChainProvider,
+		telegram:      o.Telegram,
+		logg:          o.Logg,
 	}
-}
-
-func (h *Handler) Handle(ctx context.Context, msgSubject string, msgData []byte) error {
-	var chainEvent event.Event
-
-	if err := json.Unmarshal(msgData, &chainEvent); err != nil {
-		return err
-	}
-
-	switch msgSubject {
-	case "TRACKER.TOKEN_TRANSFER":
-		return h.store.InsertTokenTransfer(ctx, chainEvent)
-	case "TRACKER.POOL_SWAP":
-		return h.store.InsertPoolSwap(ctx, chainEvent)
-	case "TRACKER.FAUCET_GIVE":
-		return h.store.InsertFaucetGive(ctx, chainEvent)
-	case "TRACKER.POOL_DEPOSIT":
-		return h.store.InsertPoolDeposit(ctx, chainEvent)
-	case "TRACKER.TOKEN_MINT":
-		return h.store.InsertTokenMint(ctx, chainEvent)
-	case "TRACKER.TOKEN_BURN":
-		return h.store.InsertTokenBurn(ctx, chainEvent)
-	case "TRACKER.QUOTER_PRICE_INDEX_UPDATED":
-		return h.store.InsertPriceQuoteUpdate(ctx, chainEvent)
-	}
-
-	return nil
 }
