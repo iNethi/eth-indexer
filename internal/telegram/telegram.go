@@ -19,8 +19,7 @@ type (
 )
 
 const (
-	NOTIFY_LOW_BALANCE_ON_GAS_FAUCET = `
-		Gas faucet balance is low. Top is required soon!`
+	NOTIFY_LOW_BALANCE_ON_GAS_FAUCET = "Gas faucet balance is low. Top-up is required soon!"
 )
 
 func New(o TelegramOpts) *Telegram {
