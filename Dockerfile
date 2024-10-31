@@ -11,7 +11,6 @@ WORKDIR /build
 
 COPY . .
 RUN go mod download
-RUN go build -o eth-indexer-bootstrap -ldflags="-X main.build=${BUILD} -s -w" cmd/bootstrap/main.go
 RUN go build -o eth-indexer -ldflags="-X main.build=${BUILD} -s -w" cmd/service/*.go
 
 FROM debian:bookworm-slim

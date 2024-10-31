@@ -4,20 +4,19 @@ import (
 	"net/http"
 
 	"github.com/VictoriaMetrics/metrics"
-	"github.com/uptrace/bunrouter"
+	"github.com/go-chi/chi/v5"
 )
 
-func New() *bunrouter.Router {
-	router := bunrouter.New()
+func New() *chi.Mux {
+	r := chi.NewRouter()
 
-	router.GET("/metrics", metricsHandler())
+	r.Get("/metrics", metricsHandler())
 
-	return router
+	return r
 }
 
-func metricsHandler() bunrouter.HandlerFunc {
-	return func(w http.ResponseWriter, _ bunrouter.Request) error {
+func metricsHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, _ *http.Request) {
 		metrics.WritePrometheus(w, true)
-		return nil
 	}
 }

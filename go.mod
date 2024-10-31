@@ -5,6 +5,7 @@ go 1.23.0
 require (
 	github.com/VictoriaMetrics/metrics v1.35.1
 	github.com/ethereum/go-ethereum v1.14.8
+	github.com/go-chi/chi/v5 v5.1.0
 	github.com/grassrootseconomics/eth-tracker v1.2.2-rc
 	github.com/grassrootseconomics/ethutils v1.3.0
 	github.com/jackc/pgx/v5 v5.6.0
@@ -19,7 +20,6 @@ require (
 	github.com/nats-io/nats.go v1.37.0
 	github.com/puzpuzpuz/xsync/v3 v3.4.0
 	github.com/sourcegraph/conc v0.3.0
-	github.com/uptrace/bunrouter v1.0.22
 )
 
 require (
