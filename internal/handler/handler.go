@@ -5,7 +5,6 @@ import (
 
 	"github.com/grassrootseconomics/eth-indexer/internal/cache"
 	"github.com/grassrootseconomics/eth-indexer/internal/store"
-	"github.com/grassrootseconomics/eth-indexer/internal/telegram"
 	"github.com/grassrootseconomics/ethutils"
 )
 
@@ -14,7 +13,6 @@ type (
 		Store         store.Store
 		Cache         *cache.Cache
 		ChainProvider *ethutils.Provider
-		Telegram      *telegram.Telegram
 		Logg          *slog.Logger
 	}
 
@@ -22,7 +20,6 @@ type (
 		store         store.Store
 		cache         *cache.Cache
 		chainProvider *ethutils.Provider
-		telegram      *telegram.Telegram
 		logg          *slog.Logger
 	}
 )
@@ -32,7 +29,6 @@ func NewHandler(o HandlerOpts) *Handler {
 		store:         o.Store,
 		cache:         o.Cache,
 		chainProvider: o.ChainProvider,
-		telegram:      o.Telegram,
 		logg:          o.Logg,
 	}
 }

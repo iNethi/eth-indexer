@@ -17,7 +17,6 @@ import (
 	"github.com/grassrootseconomics/eth-indexer/internal/handler"
 	"github.com/grassrootseconomics/eth-indexer/internal/store"
 	"github.com/grassrootseconomics/eth-indexer/internal/sub"
-	"github.com/grassrootseconomics/eth-indexer/internal/telegram"
 	"github.com/grassrootseconomics/eth-indexer/internal/util"
 	"github.com/grassrootseconomics/ethutils"
 	"github.com/knadh/koanf/v2"
@@ -70,16 +69,10 @@ func main() {
 		ko.MustInt64("chain.chainid"),
 	)
 
-	telegram := telegram.New(telegram.TelegramOpts{
-		BotToken:            ko.MustString("telegram.bot_token"),
-		NotificationChannel: ko.MustInt64("telegram.notification_channel"),
-	})
-
 	handlerContainer := handler.NewHandler(handler.HandlerOpts{
 		Store:         store,
 		Cache:         cache,
 		ChainProvider: chainProvider,
-		Telegram:      telegram,
 		Logg:          lo,
 	})
 

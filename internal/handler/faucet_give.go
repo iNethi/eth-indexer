@@ -2,10 +2,8 @@ package handler
 
 import (
 	"context"
-	"fmt"
 	"math/big"
 
-	"github.com/grassrootseconomics/eth-indexer/internal/telegram"
 	"github.com/grassrootseconomics/eth-tracker/pkg/event"
 	"github.com/lmittmann/w3"
 	"github.com/lmittmann/w3/module/eth"
@@ -28,7 +26,7 @@ func (h *Handler) FaucetHealthCheck(ctx context.Context, event event.Event) erro
 	}
 
 	if balance.Cmp(new(big.Int).Mul(w3.BigEther, big.NewInt(balanceThreshold))) < 0 {
-		return h.telegram.Notify(ctx, fmt.Sprintf("%s:\n\n %s", event.ContractAddress, telegram.NOTIFY_LOW_BALANCE_ON_GAS_FAUCET))
+		h.logg.Warn("faucet balance is less than 5 ether", "faucet", event.ContractAddress)
 	}
 
 	return nil

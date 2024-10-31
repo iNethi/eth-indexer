@@ -64,7 +64,7 @@ func NewJetStreamSub(o JetStreamOpts) (*JetStreamSub, error) {
 
 	iter, err := consumer.Messages(
 		jetstream.WithMessagesErrOnMissingHeartbeat(false),
-		jetstream.PullMaxMessages(100),
+		jetstream.PullMaxMessages(10),
 	)
 	if err != nil {
 		return nil, err
