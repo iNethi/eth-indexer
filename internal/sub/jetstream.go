@@ -6,28 +6,25 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/grassrootseconomics/eth-indexer/internal/handler"
-	"github.com/grassrootseconomics/eth-indexer/internal/store"
+	"github.com/grassrootseconomics/eth-indexer/pkg/router"
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/jetstream"
 )
 
 type (
 	JetStreamOpts struct {
-		Store       store.Store
-		Logg        *slog.Logger
-		Handler     *handler.Handler
 		Endpoint    string
 		JetStreamID string
+		Logg        *slog.Logger
+		Router      *router.Router
 	}
 
 	JetStreamSub struct {
-		jsConsumer jetstream.Consumer
-		store      store.Store
-		handler    *handler.Handler
-		natsConn   *nats.Conn
-		logg       *slog.Logger
-		durableID  string
+		jsIter    jetstream.MessagesContext
+		logg      *slog.Logger
+		natsConn  *nats.Conn
+		router    *router.Router
+		durableID string
 	}
 )
 
@@ -36,7 +33,7 @@ const (
 	pullSubject = "TRACKER.*"
 )
 
-func NewJetStreamSub(o JetStreamOpts) (Sub, error) {
+func NewJetStreamSub(o JetStreamOpts) (*JetStreamSub, error) {
 	natsConn, err := nats.Connect(o.Endpoint)
 	if err != nil {
 		return nil, err
@@ -56,50 +53,52 @@ func NewJetStreamSub(o JetStreamOpts) (Sub, error) {
 	}
 
 	consumer, err := stream.CreateOrUpdateConsumer(ctx, jetstream.ConsumerConfig{
-		Durable:   o.JetStreamID,
-		AckPolicy: jetstream.AckExplicitPolicy,
+		Durable:       o.JetStreamID,
+		AckPolicy:     jetstream.AckExplicitPolicy,
+		FilterSubject: pullSubject,
 	})
 	if err != nil {
 		return nil, err
 	}
 	o.Logg.Info("successfully connected to NATS server")
 
+	iter, err := consumer.Messages(
+		jetstream.WithMessagesErrOnMissingHeartbeat(false),
+		jetstream.PullMaxMessages(10),
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	return &JetStreamSub{
-		jsConsumer: consumer,
-		store:      o.Store,
-		handler:    o.Handler,
-		natsConn:   natsConn,
-		logg:       o.Logg,
-		durableID:  o.JetStreamID,
+		jsIter:    iter,
+		router:    o.Router,
+		natsConn:  natsConn,
+		logg:      o.Logg,
+		durableID: o.JetStreamID,
 	}, nil
 }
 
 func (s *JetStreamSub) Close() {
-	if s.natsConn != nil {
-		s.natsConn.Close()
-	}
+	s.jsIter.Stop()
 }
 
-func (s *JetStreamSub) Process() error {
+func (s *JetStreamSub) Process() {
 	for {
-		events, err := s.jsConsumer.Fetch(100, jetstream.FetchMaxWait(1*time.Second))
+		msg, err := s.jsIter.Next()
 		if err != nil {
-			if errors.Is(err, nats.ErrTimeout) {
-				continue
-			} else if errors.Is(err, nats.ErrConnectionClosed) {
-				return nil
+			if errors.Is(err, jetstream.ErrMsgIteratorClosed) {
+				s.logg.Debug("jetstream: iterator closed")
+				return
 			} else {
-				return err
+				s.logg.Debug("jetstream: unknown iterator error", "error", err)
+				continue
 			}
 		}
 
-		for msg := range events.Messages() {
-			if err := s.handler.Handle(context.Background(), msg.Subject(), msg.Data()); err != nil {
-				s.logg.Error("error processing nats message", "error", err)
-				msg.Nak()
-			} else {
-				msg.Ack()
-			}
+		s.logg.Debug("processing nats message", "subject", msg.Subject())
+		if err := s.router.Handle(context.Background(), msg); err != nil {
+			s.logg.Error("jetstream: router: error processing nats message", "error", err)
 		}
 	}
 }

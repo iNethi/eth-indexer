@@ -104,14 +104,26 @@ INSERT INTO pool_deposit(
     contract_address
 ) VALUES($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING
 
---name: insert-price-quote-update
--- $1: tx_id
--- $2: token
--- $3: exchange_rate
--- $4: contract_address
-INSERT INTO price_index_updates(
-    tx_id,
-    token,
-    exchange_rate,
-    contract_address
-) VALUES($1, $2, $3, $4) ON CONFLICT DO NOTHING
+--name: insert-token
+-- $1: contract_address
+-- $2: token_name
+-- $3: token_symbol
+-- $4: token_decimals
+-- $5: sink_address
+INSERT INTO tokens(
+	contract_address,
+	token_name,
+	token_symbol,
+	token_decimals,
+    sink_address
+) VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING
+
+--name: insert-pool
+-- $1: contract_address
+-- $2: pool_name
+-- $3: pool_symbol
+INSERT INTO tokens(
+	contract_address,
+    pool_name,
+    pool_symbol
+) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING

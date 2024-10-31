@@ -13,10 +13,12 @@ import (
 	"time"
 
 	"github.com/grassrootseconomics/eth-indexer/internal/api"
+	"github.com/grassrootseconomics/eth-indexer/internal/cache"
 	"github.com/grassrootseconomics/eth-indexer/internal/handler"
 	"github.com/grassrootseconomics/eth-indexer/internal/store"
 	"github.com/grassrootseconomics/eth-indexer/internal/sub"
 	"github.com/grassrootseconomics/eth-indexer/internal/util"
+	"github.com/grassrootseconomics/ethutils"
 	"github.com/knadh/koanf/v2"
 )
 
@@ -60,14 +62,25 @@ func main() {
 		os.Exit(1)
 	}
 
-	handler := handler.NewHandler(handler.HandlerOpts{
-		Store: store,
+	cache := cache.New()
+
+	chainProvider := ethutils.NewProvider(
+		ko.MustString("chain.rpc_endpoint"),
+		ko.MustInt64("chain.chainid"),
+	)
+
+	handlerContainer := handler.NewHandler(handler.HandlerOpts{
+		Store:         store,
+		Cache:         cache,
+		ChainProvider: chainProvider,
+		Logg:          lo,
 	})
+
+	router := bootstrapRouter(handlerContainer)
 
 	jetStreamSub, err := sub.NewJetStreamSub(sub.JetStreamOpts{
 		Logg:        lo,
-		Store:       store,
-		Handler:     handler,
+		Router:      router,
 		Endpoint:    ko.MustString("jetstream.endpoint"),
 		JetStreamID: ko.MustString("jetstream.id"),
 	})

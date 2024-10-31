@@ -29,14 +29,15 @@ type (
 	}
 
 	queries struct {
-		InsertTx               string `query:"insert-tx"`
-		InsertTokenTransfer    string `query:"insert-token-transfer"`
-		InsertTokenMint        string `query:"insert-token-mint"`
-		InsertTokenBurn        string `query:"insert-token-burn"`
-		InsertFaucetGive       string `query:"insert-faucet-give"`
-		InsertPoolSwap         string `query:"insert-pool-swap"`
-		InsertPoolDeposit      string `query:"insert-pool-deposit"`
-		InsertPriceQuoteUpdate string `query:"insert-price-quote-update"`
+		InsertTx            string `query:"insert-tx"`
+		InsertTokenTransfer string `query:"insert-token-transfer"`
+		InsertTokenMint     string `query:"insert-token-mint"`
+		InsertTokenBurn     string `query:"insert-token-burn"`
+		InsertFaucetGive    string `query:"insert-faucet-give"`
+		InsertPoolSwap      string `query:"insert-pool-swap"`
+		InsertPoolDeposit   string `query:"insert-pool-deposit"`
+		InsertToken         string `query:"insert-token"`
+		InsertPool          string `query:"insert-pool"`
 	}
 )
 
@@ -198,20 +199,29 @@ func (pg *Pg) InsertPoolDeposit(ctx context.Context, eventPayload event.Event) e
 	})
 }
 
-func (pg *Pg) InsertPriceQuoteUpdate(ctx context.Context, eventPayload event.Event) error {
+func (pg *Pg) InsertToken(ctx context.Context, contractAddress string, name string, symbol string, decimals uint8, sinkAddress string) error {
 	return pg.executeTransaction(ctx, func(tx pgx.Tx) error {
-		txID, err := pg.insertTx(ctx, tx, eventPayload)
-		if err != nil {
-			return err
-		}
-
-		_, err = tx.Exec(
+		_, err := tx.Exec(
 			ctx,
-			pg.queries.InsertPriceQuoteUpdate,
-			txID,
-			eventPayload.Payload["token"].(string),
-			eventPayload.Payload["exchangeRate"].(string),
-			eventPayload.ContractAddress,
+			pg.queries.InsertToken,
+			contractAddress,
+			name,
+			symbol,
+			decimals,
+			sinkAddress,
+		)
+		return err
+	})
+}
+
+func (pg *Pg) InsertPool(ctx context.Context, contractAddress string, name string, symbol string) error {
+	return pg.executeTransaction(ctx, func(tx pgx.Tx) error {
+		_, err := tx.Exec(
+			ctx,
+			pg.queries.InsertPool,
+			contractAddress,
+			name,
+			symbol,
 		)
 		return err
 	})

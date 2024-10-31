@@ -5,6 +5,7 @@ go 1.23.0
 require (
 	github.com/VictoriaMetrics/metrics v1.35.1
 	github.com/ethereum/go-ethereum v1.14.8
+	github.com/go-chi/chi/v5 v5.1.0
 	github.com/grassrootseconomics/eth-tracker v1.2.2-rc
 	github.com/grassrootseconomics/ethutils v1.3.0
 	github.com/jackc/pgx/v5 v5.6.0
@@ -17,7 +18,8 @@ require (
 	github.com/knadh/koanf/v2 v2.1.1
 	github.com/lmittmann/w3 v0.17.1
 	github.com/nats-io/nats.go v1.37.0
-	github.com/uptrace/bunrouter v1.0.22
+	github.com/puzpuzpuz/xsync/v3 v3.4.0
+	github.com/sourcegraph/conc v0.3.0
 )
 
 require (
@@ -63,6 +65,8 @@ require (
 	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/valyala/fastrand v1.1.0 // indirect
 	github.com/valyala/histogram v1.2.0 // indirect
+	go.uber.org/atomic v1.7.0 // indirect
+	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/crypto v0.27.0 // indirect
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/sync v0.8.0 // indirect

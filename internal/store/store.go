@@ -15,7 +15,8 @@ type (
 		InsertFaucetGive(context.Context, event.Event) error
 		InsertPoolSwap(context.Context, event.Event) error
 		InsertPoolDeposit(context.Context, event.Event) error
-		InsertPriceQuoteUpdate(context.Context, event.Event) error
+		InsertToken(context.Context, string, string, string, uint8, string) error
+		InsertPool(context.Context, string, string, string) error
 		Pool() *pgxpool.Pool
 		Close()
 	}
