@@ -5,16 +5,12 @@ go_process = true
 address = ":5002"
 
 [postgres]
-dsn = "postgres://postgres:postgres@127.0.0.1:5433/ge_celo_data"
+dsn = "postgres://postgres:postgres@127.0.0.1:5433/chain_data"
 
 [jetstream]
 endpoint = "nats://127.0.0.1:4222"
-id = "celo-indexer-1"
+id = "eth-indexer-1"
 
 [chain]
 rpc_endpoint = "http://localhost:8545"
 chainid = 1337
-
-[bootstrap]
-# This will bootstrap the cache on which addresses to track
-ge_registries = ["0xE979a64D375F5D363d7cecF3c93B9aFD40Ba9f55"]

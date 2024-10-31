@@ -1,1 +1,1 @@
-CREATE DATABASE ge_celo_data;
+CREATE DATABASE chain_data;

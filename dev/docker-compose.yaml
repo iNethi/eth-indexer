@@ -16,8 +16,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5   
-  celo-indexer:
-    image: celo-indexer:latest
+  eth-indexer:
+    image: ghcr.io/grassrootseconomics/eth-indexer:latest
     restart: unless-stopped
     depends_on:
       postgres:
