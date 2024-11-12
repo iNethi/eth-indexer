@@ -122,7 +122,7 @@ INSERT INTO tokens(
 -- $1: contract_address
 -- $2: pool_name
 -- $3: pool_symbol
-INSERT INTO tokens(
+INSERT INTO pools(
 	contract_address,
     pool_name,
     pool_symbol
