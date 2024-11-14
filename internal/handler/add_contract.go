@@ -47,7 +47,7 @@ func (h *Handler) AddToken(ctx context.Context, event event.Event) error {
 
 	if err := h.chainProvider.Client.CallCtx(
 		ctx,
-		eth.CallFunc(contractAddress, decimalsGetter).Returns(&tokenDecimals),
+		eth.CallFunc(contractAddress, sinkAddressGetter).Returns(&sinkAddress),
 	); err != nil {
 		// This will most likely revert if the contract does not have a sinkAddress
 		// Instead of handling the error we just ignore it and set the value to 0
