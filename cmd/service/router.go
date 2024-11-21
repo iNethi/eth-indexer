@@ -20,7 +20,7 @@ func bootstrapRouter(handlerContainer *handler.Handler) *router.Router {
 	)
 	router.RegisterRoute(
 		"TRACKER.TOKEN_BURN",
-		handlerContainer.IndexTokenMint,
+		handlerContainer.IndexTokenBurn,
 		handlerContainer.AddToken,
 	)
 	router.RegisterRoute(
