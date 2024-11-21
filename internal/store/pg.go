@@ -103,6 +103,7 @@ func (pg *Pg) InsertTokenMint(ctx context.Context, eventPayload event.Event) err
 		if err != nil {
 			return err
 		}
+		pg.logg.Info("InsertTokenMint", "eventPayload", eventPayload)
 
 		_, err = tx.Exec(
 			ctx,
