@@ -29,15 +29,16 @@ type (
 	}
 
 	queries struct {
-		InsertTx            string `query:"insert-tx"`
-		InsertTokenTransfer string `query:"insert-token-transfer"`
-		InsertTokenMint     string `query:"insert-token-mint"`
-		InsertTokenBurn     string `query:"insert-token-burn"`
-		InsertFaucetGive    string `query:"insert-faucet-give"`
-		InsertPoolSwap      string `query:"insert-pool-swap"`
-		InsertPoolDeposit   string `query:"insert-pool-deposit"`
-		InsertToken         string `query:"insert-token"`
-		InsertPool          string `query:"insert-pool"`
+		InsertTx              string `query:"insert-tx"`
+		InsertTokenTransfer   string `query:"insert-token-transfer"`
+		InsertTokenMint       string `query:"insert-token-mint"`
+		InsertTokenBurn       string `query:"insert-token-burn"`
+		InsertFaucetGive      string `query:"insert-faucet-give"`
+		InsertPoolSwap        string `query:"insert-pool-swap"`
+		InsertPoolDeposit     string `query:"insert-pool-deposit"`
+		InsertOwnershipChange string `query:"insert-ownership-change"`
+		InsertToken           string `query:"insert-token"`
+		InsertPool            string `query:"insert-pool"`
 	}
 )
 
@@ -193,6 +194,25 @@ func (pg *Pg) InsertPoolDeposit(ctx context.Context, eventPayload event.Event) e
 			eventPayload.Payload["initiator"].(string),
 			eventPayload.Payload["tokenIn"].(string),
 			eventPayload.Payload["amountIn"].(string),
+			eventPayload.ContractAddress,
+		)
+		return err
+	})
+}
+
+func (pg *Pg) InsertOwnershipChange(ctx context.Context, eventPayload event.Event) error {
+	return pg.executeTransaction(ctx, func(tx pgx.Tx) error {
+		txID, err := pg.insertTx(ctx, tx, eventPayload)
+		if err != nil {
+			return err
+		}
+
+		_, err = tx.Exec(
+			ctx,
+			pg.queries.InsertOwnershipChange,
+			txID,
+			eventPayload.Payload["previousOwner"].(string),
+			eventPayload.Payload["newOwner"].(string),
 			eventPayload.ContractAddress,
 		)
 		return err

@@ -38,6 +38,10 @@ func bootstrapRouter(handlerContainer *handler.Handler) *router.Router {
 		handlerContainer.IndexFaucetGive,
 		handlerContainer.FaucetHealthCheck,
 	)
+	router.RegisterRoute(
+		"TRACKER.OWNERSHIP_TRANSFERRED",
+		handlerContainer.IndexOwnershipChange,
+	)
 
 	return router
 }

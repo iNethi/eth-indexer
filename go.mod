@@ -1,6 +1,6 @@
 module github.com/grassrootseconomics/eth-indexer
 
-go 1.23.0
+go 1.23.3
 
 require (
 	github.com/VictoriaMetrics/metrics v1.35.1

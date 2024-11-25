@@ -104,6 +104,18 @@ INSERT INTO pool_deposit(
     contract_address
 ) VALUES($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING
 
+--name: insert-ownership-change
+-- $1: tx_id
+-- $2: previous_owner
+-- $3: new_owner
+-- $4: contract_address
+INSERT INTO ownership_change(
+    tx_id,
+    previous_owner,
+    new_owner,
+    contract_address
+) VALUES($1, $2, $3, $4) ON CONFLICT DO NOTHING
+
 --name: insert-token
 -- $1: contract_address
 -- $2: token_name
