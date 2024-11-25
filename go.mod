@@ -6,7 +6,7 @@ require (
 	github.com/VictoriaMetrics/metrics v1.35.1
 	github.com/ethereum/go-ethereum v1.14.8
 	github.com/go-chi/chi/v5 v5.1.0
-	github.com/grassrootseconomics/eth-tracker v1.3.0-rc
+	github.com/grassrootseconomics/eth-tracker v1.5.2-rc
 	github.com/grassrootseconomics/ethutils v1.3.0
 	github.com/jackc/pgx/v5 v5.7.1
 	github.com/jackc/tern/v2 v2.2.3
