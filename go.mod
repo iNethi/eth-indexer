@@ -1,4 +1,4 @@
-module github.com/grassrootseconomics/eth-indexer
+module github.com/grassrootseconomics/eth-indexer/v2
 
 go 1.23.3
 
