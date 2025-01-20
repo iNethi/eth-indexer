@@ -12,12 +12,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/grassrootseconomics/eth-indexer/internal/api"
-	"github.com/grassrootseconomics/eth-indexer/internal/cache"
-	"github.com/grassrootseconomics/eth-indexer/internal/handler"
-	"github.com/grassrootseconomics/eth-indexer/internal/store"
-	"github.com/grassrootseconomics/eth-indexer/internal/sub"
-	"github.com/grassrootseconomics/eth-indexer/internal/util"
+	"github.com/grassrootseconomics/eth-indexer/v2/internal/api"
+	"github.com/grassrootseconomics/eth-indexer/v2/internal/cache"
+	"github.com/grassrootseconomics/eth-indexer/v2/internal/handler"
+	"github.com/grassrootseconomics/eth-indexer/v2/internal/store"
+	"github.com/grassrootseconomics/eth-indexer/v2/internal/sub"
+	"github.com/grassrootseconomics/eth-indexer/v2/internal/util"
 	"github.com/grassrootseconomics/ethutils"
 	"github.com/knadh/koanf/v2"
 )

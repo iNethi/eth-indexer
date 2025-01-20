@@ -2,18 +2,21 @@
 
 ![GitHub Tag](https://img.shields.io/github/v/tag/grassrootseconomics/eth-indexer)
 
-A lightweight Postgres chain indexer designed to couple with [eth-tracker](https://github.com/grassrootseconomics/eth-tracker) to index all relevant GE related blockchain data on any EVM chain.
+A lightweight Postgres chain indexer designed to couple with
+[eth-tracker](https://github.com/grassrootseconomics/eth-tracker) to index all
+relevant GE related blockchain data on any EVM chain.
 
 ## Getting Started
 
 ### Prerequisites
 
-* Git
-* Docker
-* Postgres server
-* Access to a `eth-tracker` instance
+- Git
+- Docker
+- Postgres server
+- Access to a `eth-tracker` instance
 
-See [docker-compose.yaml](dev/docker-compose.yaml) for an example on how to run and deploy a single instance.
+See [docker-compose.yaml](dev/docker-compose.yaml) for an example on how to run
+and deploy a single instance.
 
 ### 1. Build the Docker image
 
@@ -34,7 +37,9 @@ For an example, see `dev/docker-compose.postgres.yaml`.
 
 ### 3. Update config values
 
-See `.env.example` on how to override default values defined in `config.toml` using env variables. Alternatively, mount your own config.toml either during build time or Docker runtime.
+See `.env.example` on how to override default values defined in `config.toml`
+using env variables. Alternatively, mount your own config.toml either during
+build time or Docker runtime.
 
 ```bash
 # Override only specific config values
@@ -44,10 +49,10 @@ mv .env.example .env
 
 Special env variables:
 
-* DEV=*
+- DEV=*
 
-Refer to [`config.toml`](config.toml) to understand different config value settings.
-
+Refer to [`config.toml`](config.toml) to understand different config value
+settings.
 
 ### 4. Run the indexer
 

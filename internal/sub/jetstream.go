@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/grassrootseconomics/eth-indexer/pkg/router"
+	"github.com/grassrootseconomics/eth-indexer/v2/pkg/router"
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/jetstream"
 )

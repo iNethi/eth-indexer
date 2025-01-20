@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/grassrootseconomics/eth-indexer/internal/handler"
-	"github.com/grassrootseconomics/eth-indexer/pkg/router"
+	"github.com/grassrootseconomics/eth-indexer/v2/internal/handler"
+	"github.com/grassrootseconomics/eth-indexer/v2/pkg/router"
 )
 
 func bootstrapRouter(handlerContainer *handler.Handler) *router.Router {
