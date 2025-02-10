@@ -39,6 +39,8 @@ type (
 		InsertOwnershipChange string `query:"insert-ownership-change"`
 		InsertToken           string `query:"insert-token"`
 		InsertPool            string `query:"insert-pool"`
+		RemovePool            string `query:"remove-pool"`
+		RemoveToken           string `query:"remove-token"`
 	}
 )
 
@@ -244,6 +246,30 @@ func (pg *Pg) InsertPool(ctx context.Context, contractAddress string, name strin
 			symbol,
 		)
 		return err
+	})
+}
+
+func (pg *Pg) RemoveContractAddress(ctx context.Context, eventPayload event.Event) error {
+	return pg.executeTransaction(ctx, func(tx pgx.Tx) error {
+		_, err := tx.Exec(
+			ctx,
+			pg.queries.RemovePool,
+			eventPayload.Payload["address"].(string),
+		)
+		if err != nil {
+			return err
+		}
+
+		_, err = tx.Exec(
+			ctx,
+			pg.queries.RemoveToken,
+			eventPayload.Payload["address"].(string),
+		)
+		if err != nil {
+			return err
+		}
+
+		return nil
 	})
 }
 

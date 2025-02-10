@@ -43,5 +43,10 @@ func bootstrapRouter(handlerContainer *handler.Handler) *router.Router {
 		handlerContainer.IndexOwnershipChange,
 	)
 
+	router.RegisterRoute(
+		"TRACKER.INDEX_REMOVE",
+		handlerContainer.IndexRemove,
+	)
+
 	return router
 }
