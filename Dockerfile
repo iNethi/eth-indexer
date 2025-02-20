@@ -11,7 +11,7 @@ WORKDIR /build
 
 COPY . .
 RUN go mod download
-RUN go build -o eth-indexer -ldflags="-X main.build=${BUILD} -s -w" cmd/service/*.go
+RUN go build -o inethi-indexer -ldflags="-X main.build=${BUILD} -s -w" cmd/service/*.go
 
 FROM debian:bookworm-slim
 
@@ -28,4 +28,4 @@ COPY LICENSE .
 
 EXPOSE 5002
 
-CMD ["./eth-indexer"]
+CMD ["./inethi-indexer"]

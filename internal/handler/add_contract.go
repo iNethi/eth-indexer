@@ -57,25 +57,25 @@ func (h *Handler) AddToken(ctx context.Context, event event.Event) error {
 	return h.store.InsertToken(ctx, event.ContractAddress, tokenName, tokenSymbol, tokenDecimals, sinkAddress.Hex())
 }
 
-func (h *Handler) AddPool(ctx context.Context, event event.Event) error {
-	if h.cache.Get(event.ContractAddress) {
-		return nil
-	}
+// func (h *Handler) AddPool(ctx context.Context, event event.Event) error {
+// 	if h.cache.Get(event.ContractAddress) {
+// 		return nil
+// 	}
 
-	var (
-		tokenName   string
-		tokenSymbol string
-	)
+// 	var (
+// 		tokenName   string
+// 		tokenSymbol string
+// 	)
 
-	contractAddress := w3.A(event.ContractAddress)
+// 	contractAddress := w3.A(event.ContractAddress)
 
-	if err := h.chainProvider.Client.CallCtx(
-		ctx,
-		eth.CallFunc(contractAddress, nameGetter).Returns(&tokenName),
-		eth.CallFunc(contractAddress, symbolGetter).Returns(&tokenSymbol),
-	); err != nil {
-		return err
-	}
+// 	if err := h.chainProvider.Client.CallCtx(
+// 		ctx,
+// 		eth.CallFunc(contractAddress, nameGetter).Returns(&tokenName),
+// 		eth.CallFunc(contractAddress, symbolGetter).Returns(&tokenSymbol),
+// 	); err != nil {
+// 		return err
+// 	}
 
-	return h.store.InsertPool(ctx, event.ContractAddress, tokenName, tokenSymbol)
-}
+// 	return h.store.InsertPool(ctx, event.ContractAddress, tokenName, tokenSymbol)
+// }
