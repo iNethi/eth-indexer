@@ -17,6 +17,7 @@ type (
 		// InsertPoolDeposit(context.Context, event.Event) error
 		// InsertOwnershipChange(context.Context, event.Event) error
 		InsertToken(context.Context, string, string, string, uint8, string) error
+		GetTokenSymbol(context.Context, string) (string, error)
 		// InsertPool(context.Context, string, string, string) error
 		// RemoveContractAddress(context.Context, event.Event) error
 		Pool() *pgxpool.Pool

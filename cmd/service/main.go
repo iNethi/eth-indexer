@@ -18,6 +18,7 @@ import (
 	"github.com/grassrootseconomics/eth-indexer/v2/internal/store"
 	"github.com/grassrootseconomics/eth-indexer/v2/internal/sub"
 	"github.com/grassrootseconomics/eth-indexer/v2/internal/util"
+	"github.com/grassrootseconomics/eth-indexer/v2/pkg/inethi"
 	"github.com/grassrootseconomics/ethutils"
 	"github.com/knadh/koanf/v2"
 )
@@ -62,6 +63,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	iClient := inethi.New(ko.MustString("inethi.api_key"), ko.MustString("inethi.endpoint"))
+
 	cache := cache.New()
 
 	chainProvider := ethutils.NewProvider(
@@ -72,6 +75,8 @@ func main() {
 	handlerContainer := handler.NewHandler(handler.HandlerOpts{
 		Store:         store,
 		Cache:         cache,
+		InethiClient:  iClient,
+		VaultAddress:  ko.MustString("chain.vault_address"),
 		ChainProvider: chainProvider,
 		Logg:          lo,
 	})

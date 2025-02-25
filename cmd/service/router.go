@@ -12,6 +12,7 @@ func bootstrapRouter(handlerContainer *handler.Handler) *router.Router {
 		"TRACKER.TOKEN_TRANSFER",
 		handlerContainer.IndexTransfer,
 		handlerContainer.AddToken,
+		handlerContainer.GenerateVoucher,
 	)
 	// router.RegisterRoute(
 	// 	"TRACKER.TOKEN_MINT",

@@ -37,7 +37,8 @@ type (
 		// InsertPoolSwap        string `query:"insert-pool-swap"`
 		// InsertPoolDeposit     string `query:"insert-pool-deposit"`
 		// InsertOwnershipChange string `query:"insert-ownership-change"`
-		InsertToken string `query:"insert-token"`
+		InsertToken    string `query:"insert-token"`
+		GetTokenSymbol string `query:"get-token-symbol"`
 		// InsertPool            string `query:"insert-pool"`
 		// RemovePool            string `query:"remove-pool"`
 		// RemoveToken           string `query:"remove-token"`
@@ -234,6 +235,18 @@ func (pg *Pg) InsertToken(ctx context.Context, contractAddress string, name stri
 		)
 		return err
 	})
+}
+
+func (pg *Pg) GetTokenSymbol(ctx context.Context, contractAddress string) (string, error) {
+	var symbol string
+	if err := pg.db.QueryRow(
+		ctx,
+		pg.queries.GetTokenSymbol,
+		contractAddress,
+	).Scan(&symbol); err != nil {
+		return "", err
+	}
+	return symbol, nil
 }
 
 // func (pg *Pg) InsertPool(ctx context.Context, contractAddress string, name string, symbol string) error {
