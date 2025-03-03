@@ -16,21 +16,24 @@ func (h *Handler) IndexTransfer(ctx context.Context, event event.Event) error {
 }
 
 const (
-	SIZE_1_GB   = 1
-	SIZE_10_GB  = 2
-	SIZE_40_GB  = 4
-	SIZE_100_GB = 3
+	SIZE_500_MB  = 6
+	SIZE_1_GB    = 1
+	SIZE_3_GB    = 7
+	SIZE_5_GB    = 8
+	SIZE_1_MONTH = 5
 )
 
 var (
-	// 5 DUNIA
-	PRICE_1_GB = big.NewInt(5_000_000)
-	// 40 DUNIA
-	PRICE_10_GB = big.NewInt(40_000_000)
-	// 120 DUNIA
-	PRICE_40_GB = big.NewInt(120_000_000)
-	// 210 DUNIA
-	PRICE_210_GB = big.NewInt(210_000_000)
+	// 500 MB = 10 DUNIA
+	PRICE_500_MB = big.NewInt(10_000_000)
+	// 1 GB = 20 DUNIA
+	PRICE_1_GB = big.NewInt(20_000_000)
+	// 3 GB = 50 DUNIA
+	PRICE_3_GB = big.NewInt(50_000_000)
+	// 5 GB = 80 DUNIA
+	PRICE_5_GB = big.NewInt(80_000_000)
+	// 1 Month = 5000 DUNIA
+	PRICE_1_MONTH = big.NewInt(5000_000_000)
 
 	AMOUNT_DIVISOR = new(big.Float).SetInt(big.NewInt(1_000_000))
 )
@@ -50,14 +53,17 @@ func (h *Handler) GenerateVoucher(ctx context.Context, event event.Event) error 
 	rec, _ := new(big.Int).SetString(event.Payload["value"].(string), 10)
 	h.logg.Debug("generate voucher", "amount", rec)
 
-	if rec.Cmp(PRICE_1_GB) == 0 || (rec.Cmp(PRICE_1_GB) == 1 && rec.Cmp(PRICE_10_GB) == -1) {
+	switch {
+	case rec.Cmp(PRICE_500_MB) == 0 || (rec.Cmp(PRICE_500_MB) == 1 && rec.Cmp(PRICE_1_GB) == -1):
+		voucherPayload.CouponSize = SIZE_500_MB
+	case rec.Cmp(PRICE_1_GB) == 0 || (rec.Cmp(PRICE_1_GB) == 1 && rec.Cmp(PRICE_3_GB) == -1):
 		voucherPayload.CouponSize = SIZE_1_GB
-	} else if rec.Cmp(PRICE_10_GB) == 0 || (rec.Cmp(PRICE_10_GB) == 1 && rec.Cmp(PRICE_40_GB) == -1) {
-		voucherPayload.CouponSize = SIZE_10_GB
-	} else if rec.Cmp(PRICE_40_GB) == 0 || (rec.Cmp(PRICE_40_GB) == 1 && rec.Cmp(PRICE_210_GB) == -1) {
-		voucherPayload.CouponSize = SIZE_40_GB
-	} else if rec.Cmp(PRICE_210_GB) == 0 || rec.Cmp(PRICE_210_GB) == 1 {
-		voucherPayload.CouponSize = SIZE_100_GB
+	case rec.Cmp(PRICE_3_GB) == 0 || (rec.Cmp(PRICE_3_GB) == 1 && rec.Cmp(PRICE_5_GB) == -1):
+		voucherPayload.CouponSize = SIZE_3_GB
+	case rec.Cmp(PRICE_5_GB) == 0 || (rec.Cmp(PRICE_5_GB) == 1 && rec.Cmp(PRICE_1_MONTH) == -1):
+		voucherPayload.CouponSize = SIZE_5_GB
+	case rec.Cmp(PRICE_1_MONTH) == 0 || rec.Cmp(PRICE_1_MONTH) == 1:
+		voucherPayload.CouponSize = SIZE_1_MONTH
 	}
 	voucherPayload.Amount = formatAmount(rec)
 	h.logg.Debug("generate voucher", "amount", voucherPayload.Amount, "size", voucherPayload.CouponSize)

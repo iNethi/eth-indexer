@@ -9,8 +9,13 @@ dsn = "postgres://postgres:postgres@127.0.0.1:5433/chain_data"
 
 [jetstream]
 endpoint = "nats://127.0.0.1:4222"
-id = "eth-indexer-1"
+id = "inethi-indexer-1"
 
 [chain]
-rpc_endpoint = "http://localhost:8545"
+rpc_endpoint = "http://127.0.0.1:8545"
 chainid = 1337
+vault_address = ""
+
+[inethi]
+endpoint = ""
+api_key = ""
