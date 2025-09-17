@@ -15,12 +15,14 @@ func (h *Handler) IndexTransfer(ctx context.Context, event event.Event) error {
 	return h.store.InsertTokenTransfer(ctx, event)
 }
 
+// TODO: Replace
 const (
-	SIZE_500_MB  = 6
-	SIZE_1_GB    = 1
-	SIZE_3_GB    = 7
-	SIZE_5_GB    = 8
-	SIZE_1_MONTH = 5
+	SIZE_500_MB           = 6
+	SIZE_1_GB             = 1
+	SIZE_3_GB             = 7
+	SIZE_5_GB             = 8
+	SIZE_1_MONTH_HOME     = 5
+	SIZE_1_MONTH_BUSINESS = 9
 )
 
 var (
@@ -32,8 +34,10 @@ var (
 	PRICE_3_GB = big.NewInt(50_000_000)
 	// 5 GB = 80 DUNIA
 	PRICE_5_GB = big.NewInt(80_000_000)
-	// 1 Month = 5000 DUNIA
-	PRICE_1_MONTH = big.NewInt(5000_000_000)
+	// 1 Month (Home) = 5000 DUNIA
+	PRICE_1_MONTH_HOME = big.NewInt(2000_000_000)
+	// 1 Month (Business) = 5000 DUNIA
+	PRICE_1_MONTH_BUSINESS = big.NewInt(5000_000_000)
 
 	AMOUNT_DIVISOR = new(big.Float).SetInt(big.NewInt(1_000_000))
 )
@@ -60,10 +64,15 @@ func (h *Handler) GenerateVoucher(ctx context.Context, event event.Event) error 
 		voucherPayload.CouponSize = SIZE_1_GB
 	case rec.Cmp(PRICE_3_GB) == 0 || (rec.Cmp(PRICE_3_GB) == 1 && rec.Cmp(PRICE_5_GB) == -1):
 		voucherPayload.CouponSize = SIZE_3_GB
-	case rec.Cmp(PRICE_5_GB) == 0 || (rec.Cmp(PRICE_5_GB) == 1 && rec.Cmp(PRICE_1_MONTH) == -1):
+	case rec.Cmp(PRICE_5_GB) == 0 || (rec.Cmp(PRICE_5_GB) == 1 && rec.Cmp(PRICE_1_MONTH_HOME) == -1):
 		voucherPayload.CouponSize = SIZE_5_GB
-	case rec.Cmp(PRICE_1_MONTH) == 0 || rec.Cmp(PRICE_1_MONTH) == 1:
-		voucherPayload.CouponSize = SIZE_1_MONTH
+	case rec.Cmp(PRICE_1_MONTH_HOME) == 0 || rec.Cmp(PRICE_1_MONTH_HOME) == 1:
+		voucherPayload.CouponSize = SIZE_1_MONTH_HOME
+	case rec.Cmp(PRICE_1_MONTH_BUSINESS) == 0 || rec.Cmp(PRICE_1_MONTH_BUSINESS) == 1:
+		voucherPayload.CouponSize = SIZE_1_MONTH_BUSINESS
+	default:
+		h.logg.Info("generate voucher skipped, unrecognized amount", "amount", rec)
+		return nil
 	}
 	voucherPayload.Amount = formatAmount(rec)
 	h.logg.Debug("generate voucher", "amount", voucherPayload.Amount, "size", voucherPayload.CouponSize)
