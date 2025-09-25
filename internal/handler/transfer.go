@@ -15,13 +15,12 @@ func (h *Handler) IndexTransfer(ctx context.Context, event event.Event) error {
 	return h.store.InsertTokenTransfer(ctx, event)
 }
 
-// TODO: Replace
 const (
-	SIZE_500_MB           = 6
+	SIZE_500_MB           = 7
 	SIZE_1_GB             = 1
-	SIZE_3_GB             = 7
-	SIZE_5_GB             = 8
-	SIZE_1_MONTH_HOME     = 5
+	SIZE_3_GB             = 6
+	SIZE_5_GB             = 2
+	SIZE_1_MONTH_HOME     = 8
 	SIZE_1_MONTH_BUSINESS = 9
 )
 
