@@ -19,3 +19,7 @@ vault_address = ""
 [inethi]
 endpoint = ""
 api_key = ""
+
+[notify]
+endpoint = ""
+bearer_token = ""
