@@ -21,8 +21,8 @@ const (
 	SIZE_1_GB             = 23
 	SIZE_3_GB             = 24
 	SIZE_5_GB             = 26
-	SIZE_1_MONTH_HOME     = 8
-	SIZE_1_MONTH_BUSINESS = 9
+	SIZE_1_MONTH_HOME     = 35
+	SIZE_1_MONTH_BUSINESS = 36
 )
 
 var (
