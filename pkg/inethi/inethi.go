@@ -95,10 +95,10 @@ func (i *InethiClient) GenerateVoucher(ctx context.Context, input VoucherPayload
 		Category             string `json:"category"`
 		Token                string `json:"token"`
 	}{
-		RadiusDeskInstancePK: 1,
+		RadiusDeskInstancePK: 3,
 		RadiusDeskProfilePK:  input.CouponSize,
-		RadiusDeskCloudPK:    1,
-		RadiusDeskRealmPK:    1,
+		RadiusDeskCloudPK:    3,
+		RadiusDeskRealmPK:    3,
 		SenderAddress:        input.SenderAddress,
 		RecipientAddress:     input.RecipientAddress,
 		Amount:               input.Amount,
