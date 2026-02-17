@@ -51,6 +51,11 @@ var (
 )
 
 func (h *Handler) GenerateVoucher(ctx context.Context, event event.Event) error {
+	if !event.Success {
+		h.logg.Warn("tx reverted on chain", "tx_hash", event.TxHash)
+		return nil
+	}
+
 	recipientAddress := event.Payload["to"].(string)
 	h.logg.Debug("generate voucher", "recipient", recipientAddress)
 	if recipientAddress != h.vaultAddress {
